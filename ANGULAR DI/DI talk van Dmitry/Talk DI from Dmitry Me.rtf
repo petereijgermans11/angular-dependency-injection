@@ -1,0 +1,213 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Arial-BoldMT;\f2\fswiss\fcharset0 Arial-ItalicMT;
+\f3\fswiss\fcharset0 Arial-BoldItalicMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww33400\viewh21000\viewkind0
+\deftab720
+\pard\pardeftab720\sl432\partightenfactor0
+
+\f0\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+\
+
+\f1\b\fs48 \ul Angular dependency injection. 
+\f0\b0\fs36 \ulnone \
+\
+\
+
+\f1\b What is Dependency injection?
+\f0\b0 \
+\
+
+\f2\i So angular docs says dependency injection is: a coding pattern in which class asks for dependencies from external sources rather than creating them itself.
+\f0\i0  \
+\
+\
+
+\f1\b Why do we need it? 
+\f0\b0 \
+\
+The main reason of dependency injection is to avoid the hard dependencies between classes and the decoupling of object creation from using of this object enables you to replace dependencies\
+without changing the class which is using them. \
+\
+
+\f1\b What does it mean for us?
+\f0\b0 \
+\
+Well i'm pretty sure that every one of you knows how to create and inject services in Angular:\
+\
+<SHOW EXAMPLE COMPONENT IN ANGULAR>\
+\
+So we have a service called User Services example which we inject in some component and what happens then?\
+Our component class doesn't create the instance of user service by itself but it 
+\f1\b delegates creating
+\f0\b0  of the service instance to the "Injector". \
+\
+
+\f1\b So what is injector?
+\f0\b0 \
+\
+Injector is an object in Angular dependency injection who is responsible for creating of the objects.\
+The injector will create an instance of our dependency (UserService in our case) and provide it as a constructor parameter for our component\
+\
+\
+\ul Code some simplified prototype of dependency injection\ulnone \
+\
+let's create our User service class, which has some method:\
+\
+sayHi() \
+\
+And this method will just console log the string "Hi" \
+And then let's create a component class which has a dependency on our user service and it should be passed via constructor all right \
+(so we just dropped the whole complexity of annotation templates)\
+\
+\ul Let\'92s implement our dependency injection mechanism:\ulnone \
+\
+1. create first a class of our injector\
+\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 if some component requests the\
+instance of some service we just return the\
+existing one instead of create the new instance of this service (angular services are actually singletones in\
+scope of injector)\
+\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 2. Create \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 container where we will be storing our service instances. Is a Map.\
+\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \
+3. Create \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 method which will be kind of a resolver of our dependencies/services\
+\
+4. Our container is empty now. Create a constructor which will be taking one parameter called providers.\
+\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 Provider is going to be an array of services/tokens we going to provide and here in\
+constructor we go through the array and create instances of these\
+services and add each of them to our container / Map\
+\
+\ul How it would be used in the application?\ulnone \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+CODE EXAMPLE\
+\
+Provide some services/tokens via new Injector == Token\
+\
+In Angular these tokens (services you want to provide) are defined in your \
+NgModel or is provided in a property inside injectable annotation in a Service!\
+\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 In Angular this is done during application bootstrapping:\
+Angular gets al defined tokens from NgModel and services.\
+\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 When angular creates an instance of our component it does something like this code\
+We use our injector in order to get an instance of our user service from\
+dependency injection container and after this we can already get access to\
+the instance of our user service and we can call its method say hi  \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+\
+\pard\pardeftab720\sl432\partightenfactor0
+
+\f1\b \cf2 \ul \ulc2 Injectors Hierarchy
+\f0\b0 \ulnone \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2  angular has not only one injector\
+but it creates a hierarchy of injectors.\
+\
+1. model injector hierarchy and\
+2. element injector hierarchy\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl432\partightenfactor0
+
+\f1\b\fs48 \cf2 Model injector hierarchy
+\f0\b0\fs36 \
+During application bootstrapping, Angular creates a root injector where we'll\
+register our services which we provided via\
+injectable annotation and all services provided in ng model\
+property called providers. \
+If those modules (were the services to belong) are 
+\f1\b NOT lazy\
+loaded
+\f0\b0  angular recursively goes through all\
+models which are being used in the application and\
+creates instances for provided services in 
+\f1\b root injector
+\f0\b0 .\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 If you provide some service in 
+\f1\b eagerly loaded model
+\f0\b0 \
+it will be added to the root injector which makes it\
+available across whole application!!!\
+\
+\
+root injector is not actually\
+the highest in this hierarchy during application bootstrapping angular\
+creates few more injectors:\
+\
+- 
+\f1\b platform injector,
+\f0\b0  is being created by platform\
+browser dynamic function inside main.ts file and it provides some\
+platform specific features like i don't know dom sanitizer\
+platform id token ect.\
+- 
+\f1\b null injector
+\f0\b0 , responsibility of this injector is just throwing an error \
+\
+-
+\f1\b  child injector.
+\f0\b0  
+\f3\i\b \ul Modules
+\f0\i0\b0 \ulnone  which were
+\f1\b  
+\f3\i loaded lazily
+\f0\i0\b0  create its \ul own child injecto\ulnone r which are\
+children for our root injector\
+\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \
+\pard\pardeftab720\sl432\partightenfactor0
+
+\f1\b\fs48 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Element injector hierarchy
+\f0\b0\fs36 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+<<<See 2 Slides, with 2 scenarios>>>\
+\
+(\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 scenario 1: If this component\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 was a part of
+\f1\b  Lazy loaded Ng
+\f0\b0 Module it would be a scope of child model\
+injector so angular would start traversing the\
+
+\f1\b model injector
+\f0\b0  tree from this child model injector\
+and yeah if angular would find the provider\
+in our root model injector it would inject this instance in our\
+child grandchild component but in our case we have nothing provided\
+so it will go up to the parent injector we'll try to resolve it there and if\
+still nothing is found it will reach our\
+null injector which throws the error\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 )\
+\pard\pardeftab720\sl432\partightenfactor0
+\cf2 \
+\
+\'97\'97\'97\
+\
+}
